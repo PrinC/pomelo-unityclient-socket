@@ -26,6 +26,12 @@ namespace Pomelo.DotNetClient
 
             this.handshake = new HandShakeService(this);
             this.state = ProtocolState.start;
+            if (!System.IO.File.Exists(serverProtoPath)) {
+              throw System.IO.FileNotFoundException("serverProtoPath not exists", serverProtoPath);
+            }
+            else if (!System.IO.File.Exists(clientProtoPath)) {
+              throw System.IO.FileNotFoundException("clientProtoPath not exists", clientProtoPath);
+            }
             messageProtocol = new MessageProtocol(dict, serverProtos, clientProtos);
         }
 
@@ -48,7 +54,7 @@ namespace Pomelo.DotNetClient
         {
             if (this.state != ProtocolState.working) return;
 
-            byte[] body = messageProtocol.encode(route, id, msg);
+            byte[] body = messageProtocol.encode(route.replace('.', '_'), id, msg);
 
             send(PackageType.PKG_DATA, body);
         }
