@@ -43,6 +43,7 @@
     <Compile Include="src\protobuf\MsgDecoder.cs" />
     <Compile Include="src\protobuf\MsgEncoder.cs" />
     <Compile Include="src\protobuf\Protobuf.cs" />
+    <Compile Include="src\protobuf\Parser.cs" />
     <Compile Include="src\protobuf\test\CodecTest.cs" />
     <Compile Include="src\protobuf\test\ProtobufTest.cs" />
     <Compile Include="src\protobuf\util\Util.cs" />

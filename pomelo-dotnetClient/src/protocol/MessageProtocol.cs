@@ -18,6 +18,13 @@ namespace Pomelo.DotNetClient
         public const int MSG_Route_Mask = 0x01;
         public const int MSG_Type_Mask = 0x07;
 
+        public MessageProtocol(JsonObject dict, string serverProtoPath, string clientProtoPath)
+        {
+          MessageProtocol(dict, 
+            Protobuf.Parser.readOriginJsonFile(clientProtoPath), 
+            Protobuf.Parser.readOriginJsonFile(clientProtoPath));
+        }
+
         public MessageProtocol(JsonObject dict, JsonObject serverProtos, JsonObject clientProtos)
         {
             ICollection<string> keys = dict.Keys;
@@ -28,13 +35,13 @@ namespace Pomelo.DotNetClient
                 this.dict[key] = value;
                 this.abbrs[value] = key;
             }
+            this.encodeProtos = Protobuf.Parser.adaptToPomelo(clientProtos);
+            this.decodeProtos = Protobuf.Parser.adaptToPomelo(serverProtos);
 
-            protobuf = new Protobuf.Protobuf(clientProtos, serverProtos);
-            this.encodeProtos = clientProtos;
-            this.decodeProtos = serverProtos;
-
+            protobuf = new Protobuf.Protobuf(this.encodeProtos, this.decodeProtos);
             this.reqMap = new Dictionary<uint, string>();
         }
+
 
         public byte[] encode(string route, JsonObject msg)
         {
@@ -92,6 +99,7 @@ namespace Pomelo.DotNetClient
             byte[] body;
             if (encodeProtos.ContainsKey(route))
             {
+                String newRoute = route.replace('.', '_');
                 body = protobuf.encode(route, msg);
             }
             else
@@ -180,6 +188,7 @@ namespace Pomelo.DotNetClient
             JsonObject msg;
             if (decodeProtos.ContainsKey(route))
             {
+                String newRoute = route.replace('.', '_');  
                 msg = protobuf.decode(route, body);
             }
             else

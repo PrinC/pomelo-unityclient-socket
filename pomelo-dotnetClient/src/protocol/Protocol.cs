@@ -18,7 +18,7 @@ namespace Pomelo.DotNetClient
             return this.pc;
         }
 
-        public Protocol(PomeloClient pc, System.Net.Sockets.Socket socket)
+        public Protocol(PomeloClient pc, System.Net.Sockets.Socket socket, string serverProtoPath, string clientProtoPath)
         {
             this.pc = pc;
             this.transporter = new Transporter(socket, this.processMessage);
@@ -26,6 +26,7 @@ namespace Pomelo.DotNetClient
 
             this.handshake = new HandShakeService(this);
             this.state = ProtocolState.start;
+            messageProtocol = new MessageProtocol(dict, serverProtos, clientProtos);
         }
 
         internal void start(JsonObject user, Action<JsonObject> callback)
@@ -135,9 +136,9 @@ namespace Pomelo.DotNetClient
                 protos = (JsonObject)sys["protos"];
                 serverProtos = (JsonObject)protos["server"];
                 clientProtos = (JsonObject)protos["client"];
+                messageProtocol = new MessageProtocol(dict, serverProtos, clientProtos);
             }
 
-            messageProtocol = new MessageProtocol(dict, serverProtos, clientProtos);
 
             //Init heartbeat service
             int interval = 0;
